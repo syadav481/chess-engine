@@ -2,10 +2,13 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { spawn } from 'child_process'
+
+let mainWindow: BrowserWindow | null = null;
 
 function createWindow(): void {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -18,7 +21,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    mainWindow?.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -35,6 +38,19 @@ function createWindow(): void {
   }
 }
 
+function startCppEngine(): void {
+  const engineProcess = spawn('../chess-engine-backend/build/engine_backend')
+
+  engineProcess.stdout.on('data', (data: Buffer) => {
+    const output = data.toString()
+    console.log('Engine output: ', output)
+
+    if (mainWindow) {
+      mainWindow.webContents.send('engine-output', output)
+    }
+  })
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -49,8 +65,9 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  ipcMain.on('engine-start', () => {
+    startCppEngine()
+  })
 
   createWindow()
 

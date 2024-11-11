@@ -1,5 +1,8 @@
 #include <iostream> 
+#include "Board.h"
 
 int main() {
-    std::cout << "hello world!" << std::endl;
+    Board b;
+    b.init();
+    b.print();
 }

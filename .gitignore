@@ -4,5 +4,6 @@
 *.DS_Store
 *.log*
 *.vscode
+*.cache
 chess-engine-backend/build
 

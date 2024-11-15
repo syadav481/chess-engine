@@ -2,9 +2,10 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { spawn } from 'child_process'
+import { ChildProcess, spawn } from 'child_process'
 
-let mainWindow: BrowserWindow | null = null;
+let mainWindow: BrowserWindow | null = null
+let engineProcess: ChildProcess | null = null
 
 function createWindow(): void {
   // Create the browser window.
@@ -38,19 +39,6 @@ function createWindow(): void {
   }
 }
 
-function startCppEngine(): void {
-  const engineProcess = spawn('../chess-engine-backend/build/engine_backend')
-
-  engineProcess.stdout.on('data', (data: Buffer) => {
-    const output = data.toString()
-    console.log('Engine output: ', output)
-
-    if (mainWindow) {
-      mainWindow.webContents.send('engine-output', output)
-    }
-  })
-}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -66,7 +54,28 @@ app.whenReady().then(() => {
   })
 
   ipcMain.on('engine-start', () => {
-    startCppEngine()
+    // I think electron will autokill this process if I just close the window
+    engineProcess = spawn('../chess-engine-backend/build/engine_backend')
+    console.log('spawned engine at pid: ', engineProcess?.pid)
+
+    engineProcess?.stdout?.on('data', (data: Buffer) => {
+      console.log('from engine: ', data.toString())
+    })
+
+    engineProcess?.on('close', (code) => {
+      console.log(`Engine process exited with code ${code}`)
+      engineProcess = null
+    })
+  })
+
+  ipcMain.on('engine-message', () => {
+    if (!engineProcess) {
+      console.log('tried to send a message but engine was not running')
+    } else if (!engineProcess.stdin) {
+      console.log('engine process exists but stdin is invalid')
+    } else {
+      engineProcess.stdin.write('so skibidi')
+    }
   })
 
   createWindow()

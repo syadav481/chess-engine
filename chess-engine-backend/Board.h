@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utils.h"
 #include <cstdint>
 #include <iostream>
 #include <sstream>
@@ -18,9 +19,9 @@ class Board {
    */
   void set_position(Pieces p, char color, size_t board_index) {
     if (color == 'b') {
-      b_pieces[p] |= (1 << board_index);
+      b_pieces[p] |= (static_cast<uint64_t>(1) << board_index);
     } else {
-      w_pieces[p] |= (1 << board_index);
+      w_pieces[p] |= (static_cast<uint64_t>(1) << board_index);
     }
   }
 
@@ -76,6 +77,9 @@ class Board {
         case 'k':
           set_position(KING, 'b', board_index++);
           break;
+        case 'p':
+          set_position(PAWNS, 'b', board_index++);
+          break;
         case 'R':
           set_position(ROOKS, 'w', board_index++);
           break;
@@ -91,8 +95,10 @@ class Board {
         case 'K':
           set_position(KING, 'w', board_index++);
           break;
+        case 'P':
+          set_position(PAWNS, 'w', board_index++);
+          break;
         case '/':
-          board_index++;
           break;
         // c is a number
         default:

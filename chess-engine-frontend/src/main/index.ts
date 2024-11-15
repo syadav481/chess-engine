@@ -3,6 +3,8 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { ChildProcess, spawn } from 'child_process'
+import { s } from 'vite/dist/node/types.d-aGj9QkWt'
+import { stderr } from 'process'
 
 let mainWindow: BrowserWindow | null = null
 let engineProcess: ChildProcess | null = null
@@ -55,11 +57,16 @@ app.whenReady().then(() => {
 
   ipcMain.on('engine-start', () => {
     // I think electron will autokill this process if I just close the window
-    engineProcess = spawn('../chess-engine-backend/build/engine_backend')
+    engineProcess = spawn('../build/engine_backend')
     console.log('spawned engine at pid: ', engineProcess?.pid)
 
     engineProcess?.stdout?.on('data', (data: Buffer) => {
-      console.log('from engine: ', data.toString())
+      console.log('ENGINE-STDOUT:', data.toString())
+    })
+
+    engineProcess?.stderr?.on('data', (data: Buffer) => {
+      console.error('ENGINE-STDERR:\n', data.toString())
+      console.error('==========================================\n')
     })
 
     engineProcess?.on('close', (code) => {

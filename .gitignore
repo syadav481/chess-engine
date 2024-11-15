@@ -6,6 +6,6 @@
 *.vscode
 *.cache
 chess-engine-backend/build
-*/build
+*build
 *.vite.config.*.mjs
 

@@ -1,13 +1,15 @@
 #pragma once
 
-#include "utils.h"
+#include "nlohmann/json_fwd.hpp"
 #include <cstdint>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
 
 using std::uint64_t;
+using json = nlohmann::json;
 
 enum Pieces { KING, QUEEN, ROOKS, BISHOPS, KNIGHTS, PAWNS };
 
@@ -169,6 +171,15 @@ public:
       std::cout << i;
     }
     std::cout << "\n";
+  }
+
+  /*
+   * converts the board into a json object as per the API of the client
+   * defined by ME
+   */
+  json jsonify() {
+    json b = {{"hello", "world"}};
+    return b;
   }
 };
 

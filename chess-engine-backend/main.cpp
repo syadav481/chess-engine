@@ -8,7 +8,7 @@ int main() {
   b.init();
   size_t i = 0;
   while (true) {
-    std::cout << "Engine ready to read..." << std::endl;
+    std::cerr << "Ready to read..." << std::endl;
     std::string in;
     std::string msg;
     char c;
@@ -24,6 +24,7 @@ int main() {
         in += c;
       }
     }
-    std::cout << "ENGINE: Received " << msg << std::endl;
+    std::cerr << "Received " << msg << std::endl;
+    std::cout << "Message from engine: " << b.jsonify() << std::endl;
   }
 }

@@ -1,8 +1,5 @@
 #include "Board.h"
 
-#include <chrono> 
-#include <thread>
-
 #include <iostream>
 #include <string>
 
@@ -11,11 +8,22 @@ int main() {
   b.init();
   size_t i = 0;
   while (true) {
-    std::cout << "Engine listening ... " << i++ << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+    std::cout << "Engine ready to read..." << std::endl;
     std::string in;
-    std::cout << "waiting for client input: ";
-    std::cin >> in;
-    std::cout << "client said: " << in << std::endl;
+    std::string msg;
+    char c;
+    while (std::cin >> c) {
+      if (c == '#') {
+        msg += in;
+        msg += ' ';
+        in = "";
+      } else if (c == '!') {
+        msg += in;
+        break;
+      } else {
+        in += c;
+      }
+    }
+    std::cout << "ENGINE: Received " << msg << std::endl;
   }
 }

@@ -118,6 +118,17 @@ public:
     b_pieces.resize(6);
   }
 
+  // REQUIRES: A FEN
+  // MODIFIES: the board
+  // EFFECTS:  wipes the board clean and applies a new FEN.
+  void init(const std::string &s) {
+    for (size_t i = 0; i < 6; ++i) {
+      w_pieces[i] = 0;
+      b_pieces[i] = 0;
+    }
+    parse_fen(s);
+  }
+
   void init() {
     std::string fen =
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";

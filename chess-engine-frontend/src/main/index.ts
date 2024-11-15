@@ -70,11 +70,15 @@ app.whenReady().then(() => {
 
   ipcMain.on('engine-message', () => {
     if (!engineProcess) {
-      console.log('tried to send a message but engine was not running')
+      console.log('CLIENT: tried to send a message but engine was not running')
     } else if (!engineProcess.stdin) {
-      console.log('engine process exists but stdin is invalid')
+      console.log('CLIENT: engine process exists but stdin is invalid')
     } else {
-      engineProcess.stdin.write('so skibidi')
+      const delim = '#'
+      const end_delim = '!'
+      const msg = `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR${delim}w${delim}KQkq${delim}-${delim}0${delim}1${end_delim}`
+      engineProcess.stdin.write(msg)
+      console.log('CLIENT: Sent: ', msg)
     }
   })
 

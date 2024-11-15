@@ -58,34 +58,47 @@ app.whenReady().then(() => {
   ipcMain.on('engine-start', () => {
     // I think electron will autokill this process if I just close the window
     engineProcess = spawn('../build/engine_backend')
-    console.log('spawned engine at pid: ', engineProcess?.pid)
 
-    engineProcess?.stdout?.on('data', (data: Buffer) => {
-      console.log('ENGINE-STDOUT:', data.toString())
-    })
-
-    engineProcess?.stderr?.on('data', (data: Buffer) => {
-      console.error('ENGINE-STDERR:\n', data.toString())
+    engineProcess?.stderr?.on('data', (buf: Buffer) => {
+      console.error('ENGINE-STDERR:\n', buf.toString())
       console.error('==========================================\n')
     })
 
+    engineProcess?.stdout?.on('data', (buf: Buffer) => {
+      const engine_output = JSON.parse(buf.toString());
+      console.log('ENGINE-STDOUT: as json', engine_output)
+      console.log('ENGINE-STDOUT: as a string', buf.toString())
+    })
+
     engineProcess?.on('close', (code) => {
-      console.log(`Engine process exited with code ${code}`)
+      console.error(`CLIENT: Engine process exited with code ${code}`)
       engineProcess = null
     })
+
+    console.error('CLIENT: Spawned engine at pid: ', engineProcess?.pid)
   })
 
   ipcMain.on('engine-message', () => {
     if (!engineProcess) {
-      console.log('CLIENT: tried to send a message but engine was not running')
+      console.error('CLIENT: tried to send a message but engine was not running')
     } else if (!engineProcess.stdin) {
-      console.log('CLIENT: engine process exists but stdin is invalid')
+      console.error('CLIENT: engine process exists but stdin is invalid')
     } else {
       const delim = '#'
       const end_delim = '!'
       const msg = `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR${delim}w${delim}KQkq${delim}-${delim}0${delim}1${end_delim}`
       engineProcess.stdin.write(msg)
-      console.log('CLIENT: Sent: ', msg)
+      console.error('CLIENT: Sent: ', msg)
+    }
+  })
+
+  ipcMain.on('engine-kill', () => {
+    if (!engineProcess) {
+      console.error('CLIENT: tried to kill engine but engine was not running')
+    }
+    else {
+      engineProcess.kill();
+      engineProcess = null;
     }
   })
 

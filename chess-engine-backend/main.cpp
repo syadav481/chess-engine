@@ -25,6 +25,6 @@ int main() {
       }
     }
     std::cerr << "Received " << msg << std::endl;
-    std::cout << "Message from engine: " << b.jsonify() << std::endl;
+    std::cout << b.jsonify() << std::endl;
   }
 }

@@ -84,10 +84,11 @@ app.whenReady().then(() => {
     } else if (!engineProcess.stdin) {
       console.error('CLIENT: engine process exists but stdin is invalid')
     } else {
-      const delim = '#'
-      const end_delim = '!'
-      const msg = `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR${delim}w${delim}KQkq${delim}-${delim}0${delim}1${end_delim}`
-      engineProcess.stdin.write(msg)
+      // const delim = '#'
+      // const end_delim = '!'
+      // const msg = `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR${delim}w${delim}KQkq${delim}-${delim}0${delim}1${end_delim}`
+      const msg = {"FEN": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"}
+      engineProcess.stdin.write(JSON.stringify(msg))
       console.error('CLIENT: Sent: ', msg)
     }
   })

@@ -185,6 +185,8 @@ public:
 
 /*
 
+an example FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+
 8 | 0 0 0 0 0 0 0 0
 7 | 0 0 0 0 0 0 0 0
 6 | 0 0 0 0 0 0 0 0

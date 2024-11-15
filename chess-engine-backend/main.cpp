@@ -9,22 +9,9 @@ int main() {
   size_t i = 0;
   while (true) {
     std::cerr << "Ready to read..." << std::endl;
-    std::string in;
-    std::string msg;
-    char c;
-    while (std::cin >> c) {
-      if (c == '#') {
-        msg += in;
-        msg += ' ';
-        in = "";
-      } else if (c == '!') {
-        msg += in;
-        break;
-      } else {
-        in += c;
-      }
-    }
-    std::cerr << "Received " << msg << std::endl;
+    json msg;
+    std::cin >> msg;
+    std::cerr << "Received " << msg.dump(4) << std::endl;
     std::cout << b.jsonify() << std::endl;
   }
 }

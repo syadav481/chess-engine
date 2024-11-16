@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { INIT_MESSAGE } from '../../dtos/client.dto'
+import { Button, Stack, Title } from '@mantine/core';
+import Board from './components/Board';
+
 
 function App(): JSX.Element {
   const [engineOutput, setEngineOutput] = useState<JSON | null>(null);
@@ -24,12 +27,13 @@ function App(): JSX.Element {
 
   // TODO NOW: Figure out how to wait for this to load
   return (
-    <>
-      <h1>Chess</h1>
-      <button onClick={start_engine_instance}>Start engine</button>
-      <button onClick={kill_engine_instance}>Kill engine</button>
-      <button onClick={send_message_to_engine}>Send a default message</button>
-    </>
+    <Stack>
+      <Title>Chess</Title>
+      <Board />
+      <Button onClick={start_engine_instance}>Start new game</Button>
+      <Button onClick={kill_engine_instance}>End game</Button>
+      <Button onClick={send_message_to_engine}>Send a default message</Button>
+    </Stack>
   )
 }
 

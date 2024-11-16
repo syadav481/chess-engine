@@ -138,9 +138,10 @@ public:
   }
 
   // THIS SHOULD NOT HAVE ANY SIDEEFFECTS
-  void print() {
+  std::string print() {
     std::vector<std::string> board(64, ".");
-    std::cout << std::boolalpha;
+    std::stringstream ss;
+    ss << std::boolalpha;
     for (size_t i = 0; i < 64; ++i) {
       uint64_t pos = static_cast<uint64_t>(1) << i; // cast is necessary
       for (size_t p = 0; p < 6; ++p) {
@@ -160,17 +161,18 @@ public:
     size_t rank = 8;
     for (size_t i = 0; i < 64; ++i) {
       if (i % 8 == 0 && i != 0) {
-        std::cout << "\n";
+        ss << "\n";
       }
-      std::cout << board[i];
+      ss << board[i];
       if (i % 8 == 7) {
-        std::cout << rank-- << std::endl;
+        ss << rank-- << std::endl;
       }
     }
     for (char i = 'a'; i <= 'h'; ++i) {
-      std::cout << i;
+      ss << i;
     }
-    std::cout << "\n";
+    ss << "\n";
+    return ss.str();
   }
 
   /*
@@ -178,7 +180,7 @@ public:
    * defined by ME
    */
   json jsonify() {
-    json b = {{"hello", "world"}};
+    json b = {{"board stringified: ", print()}};
     return b;
   }
 };

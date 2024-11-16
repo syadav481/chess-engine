@@ -1,10 +1,9 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, IpcMainEvent } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { ChildProcess, spawn } from 'child_process'
-import { s } from 'vite/dist/node/types.d-aGj9QkWt'
-import { stderr } from 'process'
+import { CLIENT_MESSAGE } from "../dtos/client.dto"
 
 let mainWindow: BrowserWindow | null = null
 let engineProcess: ChildProcess | null = null
@@ -78,16 +77,13 @@ app.whenReady().then(() => {
     console.error('CLIENT: Spawned engine at pid: ', engineProcess?.pid)
   })
 
-  ipcMain.on('engine-message', () => {
+  ipcMain.on('engine-message', (_: IpcMainEvent, msg: CLIENT_MESSAGE) => {
     if (!engineProcess) {
       console.error('CLIENT: tried to send a message but engine was not running')
     } else if (!engineProcess.stdin) {
       console.error('CLIENT: engine process exists but stdin is invalid')
     } else {
-      // const delim = '#'
-      // const end_delim = '!'
-      // const msg = `rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR${delim}w${delim}KQkq${delim}-${delim}0${delim}1${end_delim}`
-      const msg = {"FEN": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"}
+      // const msg = { "OPERATION": "INIT", "FEN": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" }
       engineProcess.stdin.write(JSON.stringify(msg))
       console.error('CLIENT: Sent: ', msg)
     }

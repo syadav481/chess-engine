@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { INIT_MESSAGE } from '../../dtos/client.dto'
 
 function App(): JSX.Element {
+  const [engineOutput, setEngineOutput] = useState<JSON | null>(null);
+
   const start_engine_instance = (): void => window.electron.ipcRenderer.send('engine-start')
   const send_message_to_engine = (): void => {
     // place holder
@@ -10,6 +12,17 @@ function App(): JSX.Element {
   }
   const kill_engine_instance = (): void => window.electron.ipcRenderer.send('engine-kill')
 
+  useEffect(() => {
+    window.api.load_engine_output((data: JSON) => {
+      setEngineOutput(data);
+    })
+
+    return () => {
+      window.api.load_engine_output(() => { });
+    }
+  }, [])
+
+  // TODO NOW: Figure out how to wait for this to load
   return (
     <>
       <h1>Chess</h1>

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "nlohmann/json_fwd.hpp"
+#include "utils.h"
+#include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -11,7 +14,10 @@
 using std::uint64_t;
 using json = nlohmann::json;
 
-enum Pieces { KING, QUEEN, ROOKS, BISHOPS, KNIGHTS, PAWNS };
+// TODO: Separate all the header files into header and source files at some
+// point
+
+enum Pieces : size_t { KING, QUEEN, ROOKS, BISHOPS, KNIGHTS, PAWNS };
 
 class Board {
 
@@ -108,6 +114,7 @@ class Board {
           break;
         }
       }
+      // TODO: Set the remaining fields of the FEN
     }
   }
 
@@ -115,26 +122,42 @@ public:
   std::vector<uint64_t> w_pieces;
   std::vector<uint64_t> b_pieces;
 
+  std::string
+      en_passant_captures; // a string in algebraic notation representing
+                           // squares that are en-passant targets
+  uint32_t halfmove_clock = 0;
+  uint32_t fullmove_clock = 0;
+  char active_color = 'w'; // can be one of w or b.
+  bool w_queen_side_castle = false;
+  bool w_king_side_castle = false;
+  bool b_queen_side_castle = false;
+  bool b_king_side_castle = false;
+
   Board() {
     w_pieces.resize(6);
     b_pieces.resize(6);
   }
 
-  // REQUIRES: A FEN
-  // MODIFIES: the board
-  // EFFECTS:  wipes the board clean and applies a new FEN.
-  void init(const std::string &s) {
-    for (size_t i = 0; i < 6; ++i) {
+  Board(const std::string &s) {
+    w_pieces.resize(6);
+    b_pieces.resize(6);
+
+    for (size_t i = 0; i < NUM_PIECE_TYPES; ++i) {
       w_pieces[i] = 0;
       b_pieces[i] = 0;
     }
     parse_fen(s);
   }
 
-  void init() {
-    std::string fen =
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    parse_fen(fen);
+  // REQUIRES: A FEN
+  // MODIFIES: the board
+  // EFFECTS:  wipes the board clean and applies a new FEN.
+  void set_board(const std::string &s) {
+    for (size_t i = 0; i < NUM_PIECE_TYPES; ++i) {
+      w_pieces[i] = 0;
+      b_pieces[i] = 0;
+    }
+    parse_fen(s);
   }
 
   // THIS SHOULD NOT HAVE ANY SIDEEFFECTS
@@ -142,9 +165,9 @@ public:
     std::vector<std::string> board(64, ".");
     std::stringstream ss;
     ss << std::boolalpha;
-    for (size_t i = 0; i < 64; ++i) {
+    for (size_t i = 0; i < NUM_SQUARES_ON_BOARD; ++i) {
       uint64_t pos = static_cast<uint64_t>(1) << i; // cast is necessary
-      for (size_t p = 0; p < 6; ++p) {
+      for (size_t p = 0; p < NUM_PIECE_TYPES; ++p) {
         // janky but just doing this for now until i actually add a gui, it does
         // not do any error checking e.g if both w_pieces[king] == 1 and
         // b_pieces[king] == 1 it will overwrite
@@ -159,7 +182,7 @@ public:
       }
     }
     size_t rank = 8;
-    for (size_t i = 0; i < 64; ++i) {
+    for (size_t i = 0; i < NUM_SQUARES_ON_BOARD; ++i) {
       if (i % 8 == 0 && i != 0) {
         ss << "\n";
       }
@@ -174,19 +197,59 @@ public:
     ss << "\n";
     return ss.str();
   }
-
-  /*
-   * converts the board into a json object as per the API of the client
-   * defined by ME
-   */
-  json jsonify() {
-    json b = {{"board stringified: ", print()}};
-    return b;
-  }
 };
+
+void to_json(json &j, const Board &b) {
+  // TODO: Handle generating possible moves here (or anywhere else??)
+  std::vector<Piece> pieces(64);
+  for (size_t i = 0; i < NUM_SQUARES_ON_BOARD; ++i) {
+    for (size_t piece_type = 0; i < NUM_PIECE_TYPES; ++i) {
+      // if the location has a 1 e.g. the board at that location does have a
+      // piece, based on the current piece type push it back and then break out.
+      Piece p;
+      if ((b.w_pieces[piece_type] & (1 << i)) ==
+          (static_cast<size_t>(1) << i)) {
+        p.color = 'w';
+      } else if ((b.b_pieces[piece_type] & (1 << i)) ==
+                 (static_cast<size_t>(1) << i)) {
+        p.color = 'b';
+      } else {
+        p.name = "EMPTY";
+      }
+      switch (piece_type) {
+      case KING:
+        p.name = "KING";
+        break;
+      case QUEEN:
+        p.name = "QUEEN";
+        break;
+      case ROOKS:
+        p.name = "ROOKS";
+        break;
+      case BISHOPS:
+        p.name = "BISHOPS";
+        break;
+      case KNIGHTS:
+        p.name = "KNIGHTS";
+        break;
+      case PAWNS:
+        p.name = "PAWNS";
+        break;
+      default:
+        break;
+      }
+      if (p.name != "EMPTY") {
+        pieces[i] = p;
+        break;
+      }
+    }
+  }
+  j = json{{"BOARD", pieces}};
+}
 
 /*
 
+https://www.chess.com/terms/fen-chess
 an example FEN: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 
 8 | 0 0 0 0 0 0 0 0

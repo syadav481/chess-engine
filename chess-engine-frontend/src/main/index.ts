@@ -64,9 +64,12 @@ app.whenReady().then(() => {
     })
 
     engineProcess?.stdout?.on('data', (buf: Buffer) => {
-      const engine_output = JSON.parse(buf.toString());
+      // TODO: Change this to use a DTO once some of the cpp side stuff is done
+      const engine_output: JSON = JSON.parse(buf.toString());
       console.log('ENGINE-STDOUT: as json', engine_output)
       console.log('ENGINE-STDOUT: as a string', buf.toString())
+
+      mainWindow?.webContents.send('load_engine_output', engine_output);
     })
 
     engineProcess?.on('close', (code) => {

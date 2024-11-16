@@ -15,14 +15,14 @@ public:
     if (operation == "INIT") {
       if (msg.contains("FEN")) {
         std::cerr << "board initialized with FEN: " << msg["FEN"] << std::endl;
-        b.init(msg["FEN"]);
+        b.set_board(msg["FEN"]);
       } else {
         std::cerr << "board initialized with default FEN: "
                      "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
                   << std::endl;
-        b.init();
+        b.set_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
       }
-      json output = {{"board", b.jsonify()}};
+      json output = b;
       std::cout << output << std::endl;
     }
   }

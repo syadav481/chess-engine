@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { ChildProcess, spawn } from 'child_process'
-import { CLIENT_MESSAGE } from "../dtos/client.dto"
+import { CLIENT_MESSAGE } from '../dtos/client.dto'
 
 let mainWindow: BrowserWindow | null = null
 let engineProcess: ChildProcess | null = null
@@ -65,11 +65,11 @@ app.whenReady().then(() => {
 
     engineProcess?.stdout?.on('data', (buf: Buffer) => {
       // TODO: Change this to use a DTO once some of the cpp side stuff is done
-      const engine_output: JSON = JSON.parse(buf.toString());
+      const engine_output: JSON = JSON.parse(buf.toString())
       console.log('ENGINE-STDOUT: as json', engine_output)
       console.log('ENGINE-STDOUT: as a string', buf.toString())
 
-      mainWindow?.webContents.send('load_engine_output', engine_output);
+      mainWindow?.webContents.send('load_engine_output', engine_output)
     })
 
     engineProcess?.on('close', (code) => {
@@ -95,10 +95,9 @@ app.whenReady().then(() => {
   ipcMain.on('engine-kill', () => {
     if (!engineProcess) {
       console.error('CLIENT: tried to kill engine but engine was not running')
-    }
-    else {
-      engineProcess.kill();
-      engineProcess = null;
+    } else {
+      engineProcess.kill()
+      engineProcess = null
     }
   })
 

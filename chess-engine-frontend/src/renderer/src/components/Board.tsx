@@ -1,23 +1,12 @@
-import { Box, Center, Paper, SimpleGrid } from '@mantine/core';
-import React from 'react';
+import { AspectRatio } from '@mantine/core'
+import { Chessboard } from 'react-chessboard'
 
 function Board() {
-    // Create an array with 64 undefined values
-    const boxes = Array(64).fill(null);
-
-    return (
-        <Paper shadow='xl' radius="md">
-            <SimpleGrid cols={8} spacing="xs">
-                {boxes.map((_, index) => (
-                    <Box key={index} bg={index % 2 == 0 ? 'rgb(66, 66, 67)' : 'gray'}>
-                        <Center>
-
-                        </Center>
-                    </Box>
-                ))}
-            </SimpleGrid>
-        </Paper>
-    );
+  return (
+    <AspectRatio ratio={1 / 1} maw={400} mx="auto" mt="1rem" mb="1rem">
+      <Chessboard id="basic_board" />
+    </AspectRatio>
+  )
 }
 
-export default Board;
+export default Board

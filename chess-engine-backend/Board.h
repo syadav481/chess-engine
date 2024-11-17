@@ -34,7 +34,7 @@ class Board {
   }
 
   // TODO: Get rid of this when using an actual GUI
-  std::string int_to_piece(unsigned int p, char color) {
+  const std::string int_to_piece(unsigned int p, char color) const {
     if (p == 0) {
       return color == 'b' ? "♚" : "♔";
     } else if (p == 1) {
@@ -161,7 +161,7 @@ public:
   }
 
   // THIS SHOULD NOT HAVE ANY SIDEEFFECTS
-  std::string print() {
+  const std::string to_string() const {
     std::vector<std::string> board(64, ".");
     std::stringstream ss;
     ss << std::boolalpha;
@@ -200,6 +200,9 @@ public:
 };
 
 void to_json(json &j, const Board &b) {
+  std::cerr << "Asked to serialize board:" << std::endl;
+  std::cerr << b.to_string() << std::endl;
+
   // TODO: Handle generating possible moves here (or anywhere else??)
   std::vector<Piece> pieces(64);
   for (size_t i = 0; i < NUM_SQUARES_ON_BOARD; ++i) {

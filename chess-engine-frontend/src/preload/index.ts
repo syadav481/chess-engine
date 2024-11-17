@@ -4,7 +4,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 // Custom APIs for renderer
 const api = {
   // TODO: Update callback here to use the dto for loading a board.
-  load_engine_output: (callback: (data: JSON) => void) => ipcRenderer.on('load_engine_output', (_: unknown, data) => callback(data))
+  load_engine_output: (callback: (data: JSON) => void) =>
+    ipcRenderer.on('load_engine_output', (_: unknown, data) => callback(data))
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
